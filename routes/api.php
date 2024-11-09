@@ -7,12 +7,14 @@ use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\bangunRumahController;
 // use App\Http\Controllers\BeliMaterialController;
 // use App\Http\Controllers\CalculatorController;
-use App\Http\Controllers\api\cetakPembelianController;
-use App\Http\Controllers\api\cetakMaterialController;
-use App\Http\Controllers\api\cetakUserController;
+use App\Http\Controllers\Api\cetakPembelianController;
+use App\Http\Controllers\Api\cetakMaterialController;
+use App\Http\Controllers\Api\cetakUserController;
 use App\Http\Controllers\PembelianController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\BarangkeluarController;
+use App\Http\Controllers\Api\TransaksiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,14 +44,24 @@ Route::get('cetak-pembelian', [cetakPembelianController::class, 'cetakLaporanPem
 Route::post('/bangunrumah', [bangunRumahController::class,'bangunrumah']);
 Route::apiResource('/materials', MaterialController::class);
 Route::get('/materials/{id}', [MaterialController::class, 'show']);
+Route::put('/materials/{id}', [MaterialController::class, 'update']);
+
+Route::post('/barangkeluar', [BarangkeluarController::class, 'store']);
+Route::get('/barangkeluar', [BarangkeluarController::class, 'index']);
+Route::delete('/barangkeluar/{id}', [BarangkeluarController::class, 'destroy']);
+
+
 Route::get('/BeliMaterialDetail/{id}', [MaterialController::class, 'detailUserBeli']);
 
 
 Route::post('/pembelian', [PembelianController::class, 'store']);
 Route::get('/riwayatpembelian', [PembelianController::class, 'index']);
-Route::put('/datapembelian/{id}', [PembelianController::class, 'konfirmasi']);
+Route::put('/datapembelian/{id}', [PembelianController::class, 'destroy']);
 
 
+Route::get('/transaksi', [TransaksiController::class,'index']);
+Route::post('/transaksi', [TransaksiController::class,'store']);
+Route::delete('/transaksi/{id}', [TransaksiController::class,'destroy']);
 
 
 // Route::post('/BeliMaterial', [BeliMaterialController::class, 'beliMaterial']);

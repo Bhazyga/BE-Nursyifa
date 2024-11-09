@@ -9,25 +9,26 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->string('deskripsi');
-            $table->string('kategori');
-            $table->string('stok');
+            $table->string('namapenyewa');
+            $table->string('alamatpenyewa');
+            $table->string('notelp');
+            $table->string('bis');
             $table->integer('harga');
-            $table->string('gambar');
+            $table->datetime(column: 'berapalama');
             $table->timestamps();
+
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('transaksis');
     }
 };

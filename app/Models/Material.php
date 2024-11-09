@@ -24,4 +24,16 @@ class Material extends Model
         return $this->hasMany(Pembelian::class);
     }
 
+    public function barangKeluar()
+    {
+        return $this->hasMany(BarangKeluar::class, 'material_id');
+    }
+
+    // Method to reduce stock when BarangKeluar is created
+    public function reduceStock($quantity)
+    {
+        $this->stok -= $quantity;
+        $this->save();
+    }
+
 }

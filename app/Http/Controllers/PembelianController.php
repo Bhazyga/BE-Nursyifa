@@ -42,7 +42,7 @@ class PembelianController extends Controller
         return response()->json($pembelian);
     }
 
-    public function konfirmasi($id)
+    public function destroy($id)
     {
 
         $pembelian = Pembelian::find($id);

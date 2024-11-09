@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pembelian;
@@ -13,7 +13,7 @@ class cetakPembelianController  extends Controller
     public function cetakLaporanPembelian()
     {
 
-        $pdf = new TCPDF();
+        $pdf = new PembelianTCPDF();
 
         $pdf->AddPage();
         $pdf->setTitle('Table Data Hasil Akhir');

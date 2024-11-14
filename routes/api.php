@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BarangkeluarController;
 use App\Http\Controllers\Api\TransaksiController;
+use App\Http\Controllers\Api\cetakTransaksiController;
+use App\Http\Controllers\Api\cetakKeluarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,10 +41,14 @@ Route::post('/index', [AuthController::class,'index']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('cetak-user', [cetakUserController::class, 'cetakLaporanUser']); //Laporan User
+Route::get('cetak-transaksi', [cetakTransaksiController::class, 'cetakLaporanTransaksi']);
+Route::get('cetak-keluar', [cetakKeluarController::class, 'cetakLaporanKeluar']);
 Route::get('cetak-material', [cetakMaterialController::class, 'cetakLaporanMaterial']);
 Route::get('cetak-pembelian', [cetakPembelianController::class, 'cetakLaporanPembelian']);
 Route::post('/bangunrumah', [bangunRumahController::class,'bangunrumah']);
 Route::apiResource('/materials', MaterialController::class);
+Route::get('/material/total-harga-pengadaan', [MaterialController::class, 'totalHargaPengadaan']);
+Route::get('material/monthly-total', [MaterialController::class, 'getMonthlyPengadaanTotal']);
 Route::get('/materials/{id}', [MaterialController::class, 'show']);
 Route::put('/materials/{id}', [MaterialController::class, 'update']);
 
@@ -61,6 +67,8 @@ Route::put('/datapembelian/{id}', [PembelianController::class, 'destroy']);
 
 Route::get('/transaksi', [TransaksiController::class,'index']);
 Route::post('/transaksi', [TransaksiController::class,'store']);
+Route::get('transaksi/monthly-totals', [TransaksiController::class, 'getMonthlyTotalHarga']);
+Route::get('/transaksi/total-harga', [TransaksiController::class, 'getTotalHarga']);
 Route::delete('/transaksi/{id}', [TransaksiController::class,'destroy']);
 
 

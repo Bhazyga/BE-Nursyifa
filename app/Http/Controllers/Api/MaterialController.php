@@ -9,6 +9,7 @@ use App\Http\Resources\MaterialResource;
 use App\Models\Barangkeluar;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Material;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -124,6 +125,49 @@ class MaterialController extends Controller
         ]);
 
         return response()->json(['message' => 'Material checked out successfully.']);
+    }
+
+    public function totalHargaPengadaan()
+    {
+        // Calculate the total of the 'harga' column
+        $totalHarga = Material::sum('harga');
+
+        return response()->json(['totalHargaPengadaan' => $totalHarga]);
+    }
+
+    public function getMonthlyPengadaanTotal()
+    {
+         // Aggregate by month and sum the 'harga' for each month
+    $monthlyTotals = Material::selectRaw('MONTH(created_at) as month, SUM(harga) as total')
+    ->groupBy('month')
+    ->orderBy('month')
+    ->get();
+
+    // Map numeric month to month name
+    $monthNames = [
+        1 => 'January',
+        2 => 'February',
+        3 => 'March',
+        4 => 'April',
+        5 => 'May',
+        6 => 'June',
+        7 => 'July',
+        8 => 'August',
+        9 => 'September',
+        10 => 'October',
+        11 => 'November',
+        12 => 'December',
+    ];
+
+    // Format the data with month names
+    $formattedData = $monthlyTotals->map(function ($item) use ($monthNames) {
+        return [
+            'month' => $monthNames[$item->month],
+            'total' => (int) $item->total, // Ensure the total is a number
+        ];
+    });
+
+    return response()->json($formattedData);
     }
 
     public function detailUserBeli(Material $material)

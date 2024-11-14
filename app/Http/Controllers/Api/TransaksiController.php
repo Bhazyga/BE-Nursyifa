@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 
 use App\Models\Transaksi;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TransaksiController extends Controller
@@ -15,6 +16,14 @@ class TransaksiController extends Controller
         $transaksi = Transaksi::orderBy('id')->paginate(10);
         return response()->json($transaksi, 200);
     }
+
+
+    public function getTotalHarga()
+    {
+        $totalHarga = Transaksi::sum('harga');
+        return response()->json(['Total_Harga' => $totalHarga], 200);
+    }
+
 
     public function store(Request $request)
     {
@@ -47,6 +56,31 @@ class TransaksiController extends Controller
             'message' => 'Transaksi berhasil disimpan',
             'data' => $transaksi
         ], 201);
+    }
+
+
+    public function getMonthlyTotalHarga()
+    {
+        // Get the monthly sum of 'harga' grouped by month
+        $monthlyTotal = Transaksi::selectRaw('
+                YEAR(tanggal) as year,
+                MONTH(tanggal) as month,
+                SUM(harga) as total')
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        // Format the data to match the chart format
+        $monthlyData = $monthlyTotal->map(function($item) {
+            return [
+                'month' => Carbon::createFromFormat('Y-m', "{$item->year}-{$item->month}")->format('F'), // Format month name
+                'total' => $item->total,
+            ];
+        });
+
+        // Return the data
+        return response()->json($monthlyData, 200);
     }
 
     public function destroy($id)

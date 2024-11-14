@@ -43,12 +43,13 @@ class cetakMaterialController extends Controller
         $pdf->finalFooter();
 
         // Generate the PDF content and return the response
-        return response($pdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Authorization, Origin');
-    }
+        return response($pdf->output('laporan_material.pdf' ,'S'), 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="laporan_material.pdf"')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Authorization, Origin');
+     }
 
     private function generatePDFContent($materials, $pdf)
     {
@@ -134,7 +135,7 @@ class MaterialTCPDF extends TCPDF
         $current_date = strftime('%A, %d %B %Y', time());
         $current_date = converterTanggal::convertToIndonesianMonth(date('F')) . date('-d-Y');
 
-        $this->Cell(0, 10, 'Banjarmasin, ' . $current_date, 0, 0, 'R');
+        $this->Cell(0, 10, 'Banjar, ' . $current_date, 0, 0, 'R');
         $this->SetY(-65);
         $this->Cell(0, 10, 'Yang Bertanda Tangan Dibawah ini', 0, 0, 'R');
         $this->SetY(-55);

@@ -11,7 +11,7 @@ class BarangkeluarSeeder extends Seeder
     public function run()
     {
         // Example seed data
-        DB::table('barangkeluar')->insert([
+        DB::table('barangkeluars')->insert([
             [
                 'material_id' => 22,
                 'quantity' => 50,

@@ -1,83 +1,93 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Barangkeluar;
 use App\Helpers\converterTanggal; // Import the helper class
 use Illuminate\Http\Request;
 use TCPDF; // Make sure to include TCPDF if you're using it
 
-class cetakUserController extends Controller
+class cetakKeluarController extends Controller
 {
-    public function cetakLaporanUser(Request $request)
+    public function cetakLaporanKeluar(Request $request)
     {
-        $perPage = 15; // Define how many users to show per page
+        $perPage = 15; // Define how many keluars to show per page
         $page = $request->input('page', 1);
 
-        // Create an instance of UserTCPDF
-        $pdf = new UserTCPDF();
+        // Create an instance of keluarTCPDF
+        $pdf = new keluarTCPDF();
         $pdf->AddPage();
-        $pdf->setTitle('Table Data Pengguna');
+        $pdf->setTitle('Table Data Keluar');
         $pdf->setFooterData();
+        $pdf->finalFooter();
 
-        // Fetch paginated users
-        $users = User::paginate($perPage, ['*'], 'page', $page);
+        // Fetch paginated keluars
+        $keluars = Barangkeluar::with('material')->paginate($perPage, ['*'], 'page', $page);
 
         // For pagination, create multiple pages if necessary
-        $totalPages = $users->lastPage();
+        $totalPages = $keluars->lastPage();
 
         // Loop through the pages
         for ($currentPage = 1; $currentPage <= $totalPages; $currentPage++) {
             if ($currentPage > 1) {
                 $pdf->AddPage(); // Add a new page only when it's not the first one
             }
-            // Get the users for the current page
-            $users = User::paginate($perPage, ['*'], 'page', $currentPage);
+            // Get the keluars for the current page
+            $keluars = Barangkeluar::with('material')->paginate($perPage, ['*'], 'page', $currentPage);
 
             // Write HTML content for the current page
-            $pdf->writeHTML($this->generatePDFContent($users, $pdf), true, false, true, false, '');
+            $pdf->writeHTML($this->generatePDFContent($keluars, $pdf), true, false, true, false, '');
         }
 
         $pdf->finalFooter();
 
         // Generate the PDF content and return the response
-        return response($pdf->output('Laporan_User', 'S'), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Authorization, Origin');
-    }
+        return response($pdf->output('Laporan_Barang_Keluar', 'S'), 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="laporan_Barang_Keluar.pdf"')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Authorization, Origin');
+     }
 
-    private function generatePDFContent($users, $pdf)
+    private function generatePDFContent($keluars, $pdf)
     {
         $pdf->SetY(40);  // Adjust this value to add space at the top (in mm)
 
         return '
-            <h2 align="center">Table Data Pengguna</h2>
+            <h2 align="center">Table Data keluar</h2>
             <table class="table table-bordered" width="100%" cellspacing="0" border="1" style="padding-left: 5px;">
-                <tr>
-                    <th align="center" style="height: 20px; width: 40px;"><b>ID</b></th>
-                    <th align="center" style="height: 20px; width: 150px;"><b>Nama</b></th>
-                    <th align="center" style="height: 20px;"><b>Email</b></th>
-                    <th align="center" style="height: 20px;"><b>Role</b></th>
-                    <th align="center" style="height: 20px;"><b>Tanggal Dibuat</b></th>
-                </tr>
-                ' . $this->fetch_data_user($users) . '
+            <tr>
+                <th align="center" style="height: 20px; width: 40px;"><b>No</b></th>
+                <th align="center" style="height: 20px; width: 100px;"><b>Nama Barang</b></th>
+                <th align="center" style="height: 20px; width: 100px;"><b>Keterangan</b></th>
+                <th align="center" style="height: 20px; width: 100px;"><b>Tanggal Keluar</b></th>
+                <th align="center" style="height: 20px;"><b>Kuantitas</b></th>
+                <th align="center" style="height: 20px;"><b>Tanggal Input</b></th>
+            </tr>
+                ' . $this->fetch_data_keluar($keluars) . '
             </table>
         ';
     }
 
-    private function fetch_data_user($users)
+    private function fetch_data_keluar($keluars)
     {
         $rows = '';
-        foreach ($users as $user) {
+        foreach ($keluars as $keluar) {
+            $keterangan = mb_strlen($keluar->keterangan) > 35
+                         ? mb_substr($keluar->keterangan, 0, 35) . '...'
+                         : $keluar->keterangan;
+
+                         $namaBarang = $keluar->material ? $keluar->material->nama : 'N/A'; // Check if related material exists
+
             $rows .= '<tr>
-                <td align="center">' . $user->id . '</td>
-                <td>' . $user->name . '</td>
-                <td>' . $user->email . '</td>
-                <td>' . $user->role . '</td>
-                <td align="center">' . $user->created_at . '</td>
+                <td align="center">' . $keluar->id . '</td>
+                <td align="center">' . $namaBarang . '</td>
+                <td>' . $keterangan . '</td>
+                <td>' . $keluar->tanggal_keluar . '</td>
+                <td align="center">' . $keluar->quantity . '</td>
+                <td align="center">' . $keluar->created_at . '</td>
             </tr>';
         }
         return $rows;
@@ -85,7 +95,7 @@ class cetakUserController extends Controller
 }
 
 
-class UserTCPDF extends TCPDF
+class keluarTCPDF extends TCPDF
 {
     public function Header()
     {
